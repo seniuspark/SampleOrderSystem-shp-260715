@@ -88,7 +88,14 @@ private:
         std::vector<Order> orders;
         for (const nlohmann::json& element : JsonCodec::ReadJsonArray(filePath, OrdersKey))
         {
-            orders.push_back(JsonCodec::OrderFromJson(element));
+            try
+            {
+                orders.push_back(JsonCodec::OrderFromJson(element));
+            }
+            catch (const std::exception&)
+            {
+                continue;
+            }
         }
         return orders;
     }

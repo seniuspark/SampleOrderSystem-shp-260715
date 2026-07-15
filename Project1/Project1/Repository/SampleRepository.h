@@ -88,7 +88,14 @@ private:
         std::vector<Sample> samples;
         for (const nlohmann::json& element : JsonCodec::ReadJsonArray(filePath, SamplesKey))
         {
-            samples.push_back(JsonCodec::SampleFromJson(element));
+            try
+            {
+                samples.push_back(JsonCodec::SampleFromJson(element));
+            }
+            catch (const nlohmann::json::exception&)
+            {
+                continue;
+            }
         }
         return samples;
     }

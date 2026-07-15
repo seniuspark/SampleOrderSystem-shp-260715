@@ -106,7 +106,21 @@ inline std::vector<nlohmann::json> ReadJsonArray(const std::filesystem::path& fi
         return elements;
     }
 
-    nlohmann::json root = nlohmann::json::parse(content);
+    nlohmann::json root;
+    try
+    {
+        root = nlohmann::json::parse(content);
+    }
+    catch (const nlohmann::json::parse_error&)
+    {
+        return elements;
+    }
+
+    if (!root.is_object() || !root.contains(arrayKey))
+    {
+        return elements;
+    }
+
     for (const nlohmann::json& element : root.at(arrayKey))
     {
         elements.push_back(element);
