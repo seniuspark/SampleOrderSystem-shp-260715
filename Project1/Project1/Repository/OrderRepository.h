@@ -85,19 +85,7 @@ private:
 
     static std::vector<Order> Load(const std::filesystem::path& filePath)
     {
-        std::vector<Order> orders;
-        for (const nlohmann::json& element : JsonCodec::ReadJsonArray(filePath, OrdersKey))
-        {
-            try
-            {
-                orders.push_back(JsonCodec::OrderFromJson(element));
-            }
-            catch (const std::exception&)
-            {
-                continue;
-            }
-        }
-        return orders;
+        return JsonCodec::LoadElementsSkippingInvalid<Order>(filePath, OrdersKey, JsonCodec::OrderFromJson);
     }
 
     void Save() const

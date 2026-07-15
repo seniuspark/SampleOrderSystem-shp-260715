@@ -85,19 +85,7 @@ private:
 
     static std::vector<Sample> Load(const std::filesystem::path& filePath)
     {
-        std::vector<Sample> samples;
-        for (const nlohmann::json& element : JsonCodec::ReadJsonArray(filePath, SamplesKey))
-        {
-            try
-            {
-                samples.push_back(JsonCodec::SampleFromJson(element));
-            }
-            catch (const nlohmann::json::exception&)
-            {
-                continue;
-            }
-        }
-        return samples;
+        return JsonCodec::LoadElementsSkippingInvalid<Sample>(filePath, SamplesKey, JsonCodec::SampleFromJson);
     }
 
     void Save() const

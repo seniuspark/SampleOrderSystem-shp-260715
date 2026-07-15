@@ -128,6 +128,24 @@ inline std::vector<nlohmann::json> ReadJsonArray(const std::filesystem::path& fi
     return elements;
 }
 
+template <typename T, typename Converter>
+inline std::vector<T> LoadElementsSkippingInvalid(const std::filesystem::path& filePath, const std::string& arrayKey, Converter convert)
+{
+    std::vector<T> elements;
+    for (const nlohmann::json& element : ReadJsonArray(filePath, arrayKey))
+    {
+        try
+        {
+            elements.push_back(convert(element));
+        }
+        catch (const std::exception&)
+        {
+            continue;
+        }
+    }
+    return elements;
+}
+
 inline void WriteJsonArray(const std::filesystem::path& filePath, const std::string& arrayKey, const nlohmann::json& arrayJson)
 {
     std::filesystem::create_directories(filePath.parent_path());
