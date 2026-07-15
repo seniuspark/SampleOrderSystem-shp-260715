@@ -12,10 +12,7 @@ public:
     Sample(std::string sampleId, std::string name, double avgProductionTime, double yield, int stock)
         : SampleId(std::move(sampleId)), Name(std::move(name)), AvgProductionTime(avgProductionTime), Yield(yield), Stock(stock)
     {
-        if (Yield <= MinYieldExclusive || Yield > MaxYieldInclusive)
-        {
-            throw std::invalid_argument("Yield must be within (0.0, 1.0]");
-        }
+        ValidateInvariants();
     }
 
     std::string SampleId;
@@ -23,4 +20,21 @@ public:
     double AvgProductionTime;
     double Yield;
     int Stock;
+
+private:
+    void ValidateInvariants() const
+    {
+        if (Yield <= MinYieldExclusive || Yield > MaxYieldInclusive)
+        {
+            throw std::invalid_argument("Yield must be within (0.0, 1.0]");
+        }
+        if (AvgProductionTime <= 0.0)
+        {
+            throw std::invalid_argument("AvgProductionTime must be positive");
+        }
+        if (Stock < 0)
+        {
+            throw std::invalid_argument("Stock must not be negative");
+        }
+    }
 };
