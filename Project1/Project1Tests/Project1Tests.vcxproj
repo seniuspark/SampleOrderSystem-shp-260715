@@ -98,6 +98,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HarnessSanityTest.cpp" />
+    <ClCompile Include="SampleTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
