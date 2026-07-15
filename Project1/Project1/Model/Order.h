@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -21,6 +22,15 @@ public:
     int Quantity;
     OrderStatus Status;
     std::chrono::system_clock::time_point CreatedAt;
+
+    // PRODUCING 상태로 전환될 때 생산 큐 등록 시점에 계산된 값을 함께 저장해
+    // 둔다. 생산 큐 자체는 프로세스 메모리에만 있으므로(재시작 시 소실),
+    // 앱을 재시작해도 진행 중인 생산 큐를 복원할 수 있도록 이 값들을
+    // Repository에 함께 영속화한다(ProductionLineController가 기록/복원).
+    std::optional<int> ProductionShortage;
+    std::optional<int> ProductionActualQuantity;
+    std::optional<double> ProductionTotalTimeMinutes;
+    std::optional<std::chrono::system_clock::time_point> ProductionStartedAt;
 
 private:
     static constexpr int MinQuantity = 1;

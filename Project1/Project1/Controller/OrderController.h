@@ -102,12 +102,11 @@ public:
         }
         else
         {
-            order->Status = OrderStatus::PRODUCING;
-            orderRepository_.Update(*order);
-
             // 생산 큐의 부족분/실생산량 계산은 물리적 Stock이 아니라 가용재고
             // 기준이어야 하므로(docs/PRD.md 2-1~2-3), 큐 등록 시 전달하는
-            // Sample의 Stock을 가용재고로 대체한다.
+            // Sample의 Stock을 가용재고로 대체한다. order를 PRODUCING으로
+            // 전환하고 Repository에 반영하는 것은 EnqueueProductionItem이
+            // 담당한다(생산 큐 복원에 필요한 메타데이터도 함께 영속화).
             Sample sampleWithAvailableStock = *sample;
             sampleWithAvailableStock.Stock = availableStock;
             productionLineController_.EnqueueProductionItem(*order, sampleWithAvailableStock);

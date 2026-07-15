@@ -66,7 +66,7 @@ inline Sample SampleFromJson(const nlohmann::json& json)
 
 inline nlohmann::json ToJson(const Order& order)
 {
-    return nlohmann::json{
+    nlohmann::json json{
         {"orderId", order.OrderId},
         {"sampleId", order.SampleId},
         {"customerName", order.CustomerName},
@@ -74,6 +74,28 @@ inline nlohmann::json ToJson(const Order& order)
         {"status", ToString(order.Status)},
         {"createdAt", FormatIso8601(order.CreatedAt)},
     };
+
+    // 생산 큐 복원에 필요한 값들은 PRODUCING 상태일 때만 의미가 있으므로,
+    // 값이 없으면 필드를 아예 생략한다(fail-soft 정책과 동일하게, 이
+    // 필드가 없는 예전 데이터를 읽어도 OrderFromJson이 문제없이 동작해야 함).
+    if (order.ProductionShortage.has_value())
+    {
+        json["productionShortage"] = *order.ProductionShortage;
+    }
+    if (order.ProductionActualQuantity.has_value())
+    {
+        json["productionActualQuantity"] = *order.ProductionActualQuantity;
+    }
+    if (order.ProductionTotalTimeMinutes.has_value())
+    {
+        json["productionTotalTimeMinutes"] = *order.ProductionTotalTimeMinutes;
+    }
+    if (order.ProductionStartedAt.has_value())
+    {
+        json["productionStartedAt"] = FormatIso8601(*order.ProductionStartedAt);
+    }
+
+    return json;
 }
 
 inline Order OrderFromJson(const nlohmann::json& json)
@@ -85,6 +107,24 @@ inline Order OrderFromJson(const nlohmann::json& json)
         json.at("quantity").get<int>(),
         ParseIso8601(json.at("createdAt").get<std::string>()));
     order.Status = ParseOrderStatus(json.at("status").get<std::string>());
+
+    if (json.contains("productionShortage"))
+    {
+        order.ProductionShortage = json.at("productionShortage").get<int>();
+    }
+    if (json.contains("productionActualQuantity"))
+    {
+        order.ProductionActualQuantity = json.at("productionActualQuantity").get<int>();
+    }
+    if (json.contains("productionTotalTimeMinutes"))
+    {
+        order.ProductionTotalTimeMinutes = json.at("productionTotalTimeMinutes").get<double>();
+    }
+    if (json.contains("productionStartedAt"))
+    {
+        order.ProductionStartedAt = ParseIso8601(json.at("productionStartedAt").get<std::string>());
+    }
+
     return order;
 }
 
