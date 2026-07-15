@@ -21,7 +21,7 @@ Controller에서 구현하고, 콘솔 없이 FakeView를 주입해 TDD로 검증
   상태별 집계(`CountOrdersByStatus`류, REJECTED 제외)와 시료별 재고 판정
   (`BuildStockLevels`류, demand = RESERVED+CONFIRMED+PRODUCING 수량 합)를
   재구현.
-- 상위 `../../CLAUDE.md`/`../CLAUDE.md`의 메뉴별 기능 명세와 상태 전이 규칙.
+- 이 저장소의 `../CLAUDE.md`의 메뉴별 기능 명세와 상태 전이 규칙.
 - `docs/PRD.md`의 정책 결정 현황(2-1~2-8) — 가용재고 계산, 승인 판정 기준,
   생산완료 자동 트리거, `OrderId` 채번, 재고 초기값 등. 이 phase의 3-2/3-3/3-4/
   3-6 테스트 목록은 해당 결정을 전제로 작성되었다.

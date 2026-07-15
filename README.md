@@ -1,10 +1,11 @@
 # SampleOrderSystem-shp-260715
 
-반도체 시료 생산주문관리 시스템의 **최종 통합 시스템**. `MVC`/`Json`/`Monitor`/
-`Dummy` 4개 PoC에서 검증된 설계(계층 분리, JSON 영속성, 모니터링 집계, 더미
-데이터 생성)를 사람이 다시 구현하는 방식으로 통합한다. 전체 배경/도메인 모델은
-상위 저장소의 `../CLAUDE.md`, 이 저장소의 목표/메뉴 명세는 [`CLAUDE.md`](CLAUDE.md),
-phase별 진행 계획은 [`docs/Plan.md`](docs/Plan.md)를 참고한다.
+반도체 시료 생산주문관리 시스템의 **최종 통합 시스템**. 개발 과정에서 `MVC`/
+`Json`/`Monitor`/`Dummy` 4개 PoC에서 검증한 설계(계층 분리, JSON 영속성,
+모니터링 집계, 더미 데이터 생성)를 사람이 참고해 다시 구현하는 방식으로
+통합했다. 전체 배경/도메인 모델과 이 저장소의 목표/메뉴 명세는
+[`CLAUDE.md`](CLAUDE.md), phase별 진행 계획은 [`docs/Plan.md`](docs/Plan.md)를
+참고한다.
 
 ## 디렉토리 구조
 
