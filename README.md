@@ -15,17 +15,20 @@ Main/
 │   ├── Plan.md               # Phase 0~5 전체 계획
 │   ├── PRD.md                # 정책 결정 문서(재고/생산/채번 등, 아래 요약 참고)
 │   ├── phase0-harness.md ~ phase5-integration.md
-└── Project1/                 # Visual Studio 솔루션 스캐폴딩(Phase 0 착수 전)
+└── Project1/                 # Visual Studio 솔루션
     ├── Project1.slnx
-    └── Project1/Project1.vcxproj
+    ├── Project1/Project1.vcxproj            # 실행 파일 프로젝트(Phase 1부터 소스 추가 예정)
+    └── Project1Tests/Project1Tests.vcxproj  # gtest 테스트 프로젝트(Phase 0 완료)
 ```
 
 ## 현재 진행 상태
 
-`Project1.slnx`/`Project1.vcxproj` 스캐폴딩만 존재하며, 아직 Phase 0(테스트
-하네스 구성)을 시작하기 전 단계다. 구현에 들어가기 전, 4개 PoC 어디에도 없던
-정책(재고 차감 시점, 승인 판정 기준, 생산완료 트리거, ID 채번 등)을 먼저
-논의해 `docs/PRD.md`에 결정 사항으로 고정했다. 아래는 그 요약이다.
+Phase 0(테스트 하네스 구성)이 완료된 상태다. `Project1Tests` 프로젝트가
+googletest/nlohmann.json NuGet 패키지로 구성되었고, `HarnessSanityTest` 1건이
+빌드·통과(Green)한다. 실행 파일 프로젝트(`Project1`)에는 아직 도메인 소스가
+없으며, Phase 1(Model 계층)부터 TDD로 채워나간다. 구현에 들어가기 전, 4개
+PoC 어디에도 없던 정책(재고 차감 시점, 승인 판정 기준, 생산완료 트리거, ID
+채번 등)을 먼저 논의해 `docs/PRD.md`에 결정 사항으로 고정했다. 아래는 그 요약이다.
 
 ## 확정된 핵심 정책 (`docs/PRD.md` 상세 근거 참고)
 
