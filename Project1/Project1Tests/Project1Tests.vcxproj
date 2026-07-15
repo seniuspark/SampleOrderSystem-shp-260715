@@ -113,6 +113,12 @@
     <ClCompile Include="OrderControllerTest.cpp" />
     <ClCompile Include="ProductionLineControllerTest.cpp" />
     <ClCompile Include="MonitoringControllerTest.cpp" />
+    <ClCompile Include="SummaryRendererTest.cpp" />
+    <ClCompile Include="ConsoleAppViewTest.cpp" />
+    <ClCompile Include="ConsoleSampleViewTest.cpp" />
+    <ClCompile Include="ConsoleOrderViewTest.cpp" />
+    <ClCompile Include="ConsoleProductionLineViewTest.cpp" />
+    <ClCompile Include="ConsoleMonitoringViewTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

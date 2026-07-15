@@ -55,6 +55,11 @@ public:
         view_.ShowProductionQueue(std::vector<ProductionQueueItem>(queue_.begin(), queue_.end()));
     }
 
+    std::size_t QueueSize() const
+    {
+        return queue_.size();
+    }
+
 private:
     void CompleteFrontIfDue()
     {
