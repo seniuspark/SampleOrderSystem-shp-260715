@@ -187,6 +187,74 @@ TEST(SampleRepositoryTest, Delete_ThenReload_RemovesEntry)
     EXPECT_FALSE(reloadedRepository.FindById("S-011").has_value());
 }
 
+TEST(SampleRepositoryTest, MalformedJsonSyntax_GetAllReturnsEmptyAndFileUnchanged)
+{
+    std::filesystem::path filePath = MakeSampleRepositoryFilePath("MalformedJsonSyntax_GetAllReturnsEmptyAndFileUnchanged");
+    std::filesystem::create_directories(filePath.parent_path());
+    std::string malformedContent = "{ \"samples\": [ { \"sampleId\": \"S-001\", ";
+    {
+        std::ofstream output(filePath);
+        output << malformedContent;
+    }
+
+    SampleRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+
+    std::ifstream afterInput(filePath);
+    std::string contentAfter((std::istreambuf_iterator<char>(afterInput)), std::istreambuf_iterator<char>());
+    EXPECT_EQ(contentAfter, malformedContent);
+}
+
+TEST(SampleRepositoryTest, TopLevelIsArray_GetAllReturnsEmpty)
+{
+    std::filesystem::path filePath = MakeSampleRepositoryFilePath("TopLevelIsArray_GetAllReturnsEmpty");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << "[ { \"sampleId\": \"S-001\" } ]";
+    }
+
+    SampleRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+}
+
+TEST(SampleRepositoryTest, MissingSamplesKey_GetAllReturnsEmpty)
+{
+    std::filesystem::path filePath = MakeSampleRepositoryFilePath("MissingSamplesKey_GetAllReturnsEmpty");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << "{ \"unexpectedKey\": [] }";
+    }
+
+    SampleRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+}
+
+TEST(SampleRepositoryTest, OneElementMissingRequiredField_SkipsThatElementOnly)
+{
+    std::filesystem::path filePath = MakeSampleRepositoryFilePath("OneElementMissingRequiredField_SkipsThatElementOnly");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << R"({
+            "samples": [
+                { "sampleId": "S-101", "name": "Valid", "avgProductionTime": 5.0, "yield": 0.9, "stock": 10 },
+                { "sampleId": "S-102", "avgProductionTime": 5.0, "yield": 0.9, "stock": 10 }
+            ]
+        })";
+    }
+
+    SampleRepository repository(filePath);
+
+    std::vector<Sample> all = repository.GetAll();
+    ASSERT_EQ(all.size(), 1u);
+    EXPECT_EQ(all[0].SampleId, "S-101");
+}
+
 TEST(SampleRepositoryTest, Delete_UnknownId_ReturnsFalseAndFileUnchanged)
 {
     std::filesystem::path filePath = MakeSampleRepositoryFilePath("Delete_UnknownId_ReturnsFalseAndFileUnchanged");

@@ -188,6 +188,95 @@ TEST(OrderRepositoryTest, Delete_ThenReload_RemovesEntry)
     EXPECT_FALSE(reloadedRepository.FindById("ORD-20260715-0011").has_value());
 }
 
+TEST(OrderRepositoryTest, MalformedJsonSyntax_GetAllReturnsEmptyAndFileUnchanged)
+{
+    std::filesystem::path filePath = MakeOrderRepositoryFilePath("MalformedJsonSyntax_GetAllReturnsEmptyAndFileUnchanged");
+    std::filesystem::create_directories(filePath.parent_path());
+    std::string malformedContent = "{ \"orders\": [ { \"orderId\": \"ORD-20260715-0100\", ";
+    {
+        std::ofstream output(filePath);
+        output << malformedContent;
+    }
+
+    OrderRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+
+    std::ifstream afterInput(filePath);
+    std::string contentAfter((std::istreambuf_iterator<char>(afterInput)), std::istreambuf_iterator<char>());
+    EXPECT_EQ(contentAfter, malformedContent);
+}
+
+TEST(OrderRepositoryTest, TopLevelIsArray_GetAllReturnsEmpty)
+{
+    std::filesystem::path filePath = MakeOrderRepositoryFilePath("TopLevelIsArray_GetAllReturnsEmpty");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << "[ { \"orderId\": \"ORD-20260715-0101\" } ]";
+    }
+
+    OrderRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+}
+
+TEST(OrderRepositoryTest, MissingOrdersKey_GetAllReturnsEmpty)
+{
+    std::filesystem::path filePath = MakeOrderRepositoryFilePath("MissingOrdersKey_GetAllReturnsEmpty");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << "{ \"unexpectedKey\": [] }";
+    }
+
+    OrderRepository repository(filePath);
+
+    EXPECT_TRUE(repository.GetAll().empty());
+}
+
+TEST(OrderRepositoryTest, OneElementMissingRequiredField_SkipsThatElementOnly)
+{
+    std::filesystem::path filePath = MakeOrderRepositoryFilePath("OneElementMissingRequiredField_SkipsThatElementOnly");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << R"({
+            "orders": [
+                { "orderId": "ORD-20260715-0102", "sampleId": "S-102", "customerName": "CustomerValid", "quantity": 3, "status": "RESERVED", "createdAt": "2026-07-15T00:00:00Z" },
+                { "orderId": "ORD-20260715-0103", "sampleId": "S-103", "quantity": 3, "status": "RESERVED", "createdAt": "2026-07-15T00:00:00Z" }
+            ]
+        })";
+    }
+
+    OrderRepository repository(filePath);
+
+    std::vector<Order> all = repository.GetAll();
+    ASSERT_EQ(all.size(), 1u);
+    EXPECT_EQ(all[0].OrderId, "ORD-20260715-0102");
+}
+
+TEST(OrderRepositoryTest, OneElementUnknownStatus_SkipsThatElementOnly)
+{
+    std::filesystem::path filePath = MakeOrderRepositoryFilePath("OneElementUnknownStatus_SkipsThatElementOnly");
+    std::filesystem::create_directories(filePath.parent_path());
+    {
+        std::ofstream output(filePath);
+        output << R"({
+            "orders": [
+                { "orderId": "ORD-20260715-0104", "sampleId": "S-104", "customerName": "CustomerValid", "quantity": 3, "status": "RESERVED", "createdAt": "2026-07-15T00:00:00Z" },
+                { "orderId": "ORD-20260715-0105", "sampleId": "S-105", "customerName": "CustomerInvalid", "quantity": 3, "status": "UNKNOWN_STATUS", "createdAt": "2026-07-15T00:00:00Z" }
+            ]
+        })";
+    }
+
+    OrderRepository repository(filePath);
+
+    std::vector<Order> all = repository.GetAll();
+    ASSERT_EQ(all.size(), 1u);
+    EXPECT_EQ(all[0].OrderId, "ORD-20260715-0104");
+}
+
 TEST(OrderRepositoryTest, Delete_UnknownId_ReturnsFalseAndFileUnchanged)
 {
     std::filesystem::path filePath = MakeOrderRepositoryFilePath("Delete_UnknownId_ReturnsFalseAndFileUnchanged");
