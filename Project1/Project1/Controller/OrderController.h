@@ -73,10 +73,9 @@ public:
     void ApproveOrder()
     {
         const std::string orderId = view_.ReadOrderId();
-        std::optional<Order> order = orderRepository_.FindById(orderId);
+        std::optional<Order> order = FindOrderOrShowNotFoundMessage(orderId);
         if (!order.has_value())
         {
-            view_.ShowMessage("존재하지 않는 주문 ID입니다: " + orderId);
             return;
         }
         if (order->Status != OrderStatus::RESERVED)
@@ -105,7 +104,13 @@ public:
         {
             order->Status = OrderStatus::PRODUCING;
             orderRepository_.Update(*order);
-            productionLineController_.EnqueueProductionItem(*order, *sample);
+
+            // 생산 큐의 부족분/실생산량 계산은 물리적 Stock이 아니라 가용재고
+            // 기준이어야 하므로(docs/PRD.md 2-1~2-3), 큐 등록 시 전달하는
+            // Sample의 Stock을 가용재고로 대체한다.
+            Sample sampleWithAvailableStock = *sample;
+            sampleWithAvailableStock.Stock = availableStock;
+            productionLineController_.EnqueueProductionItem(*order, sampleWithAvailableStock);
             view_.ShowMessage("재고 부족으로 생산 큐에 등록되었습니다: " + orderId);
         }
     }
@@ -113,10 +118,9 @@ public:
     void RejectOrder()
     {
         const std::string orderId = view_.ReadOrderId();
-        std::optional<Order> order = orderRepository_.FindById(orderId);
+        std::optional<Order> order = FindOrderOrShowNotFoundMessage(orderId);
         if (!order.has_value())
         {
-            view_.ShowMessage("존재하지 않는 주문 ID입니다: " + orderId);
             return;
         }
         if (order->Status != OrderStatus::RESERVED)
@@ -144,10 +148,9 @@ public:
     void ReleaseOrder()
     {
         const std::string orderId = view_.ReadOrderId();
-        std::optional<Order> order = orderRepository_.FindById(orderId);
+        std::optional<Order> order = FindOrderOrShowNotFoundMessage(orderId);
         if (!order.has_value())
         {
-            view_.ShowMessage("존재하지 않는 주문 ID입니다: " + orderId);
             return;
         }
         if (order->Status != OrderStatus::CONFIRMED)
@@ -173,6 +176,16 @@ public:
     }
 
 private:
+    std::optional<Order> FindOrderOrShowNotFoundMessage(const std::string& orderId)
+    {
+        std::optional<Order> order = orderRepository_.FindById(orderId);
+        if (!order.has_value())
+        {
+            view_.ShowMessage("존재하지 않는 주문 ID입니다: " + orderId);
+        }
+        return order;
+    }
+
     std::vector<std::string> CollectExistingOrderIds() const
     {
         std::vector<std::string> orderIds;
