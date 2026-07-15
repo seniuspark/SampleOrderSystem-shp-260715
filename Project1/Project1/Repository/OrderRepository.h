@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <filesystem>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -37,18 +39,42 @@ public:
 
     void Add(const Order& order)
     {
+        if (FindById(order.OrderId).has_value())
+        {
+            throw std::invalid_argument("Order with duplicate OrderId: " + order.OrderId);
+        }
         orders_.push_back(order);
         Save();
     }
 
     bool Update(const Order& order)
     {
-        return false;
+        auto it = std::find_if(orders_.begin(), orders_.end(), [&order](const Order& existing)
+            {
+                return existing.OrderId == order.OrderId;
+            });
+        if (it == orders_.end())
+        {
+            return false;
+        }
+        *it = order;
+        Save();
+        return true;
     }
 
     bool Delete(const std::string& orderId)
     {
-        return false;
+        auto it = std::find_if(orders_.begin(), orders_.end(), [&orderId](const Order& existing)
+            {
+                return existing.OrderId == orderId;
+            });
+        if (it == orders_.end())
+        {
+            return false;
+        }
+        orders_.erase(it);
+        Save();
+        return true;
     }
 
 private:

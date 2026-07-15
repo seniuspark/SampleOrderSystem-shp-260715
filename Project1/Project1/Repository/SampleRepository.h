@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <filesystem>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -37,18 +39,42 @@ public:
 
     void Add(const Sample& sample)
     {
+        if (FindById(sample.SampleId).has_value())
+        {
+            throw std::invalid_argument("Sample with duplicate SampleId: " + sample.SampleId);
+        }
         samples_.push_back(sample);
         Save();
     }
 
     bool Update(const Sample& sample)
     {
-        return false;
+        auto it = std::find_if(samples_.begin(), samples_.end(), [&sample](const Sample& existing)
+            {
+                return existing.SampleId == sample.SampleId;
+            });
+        if (it == samples_.end())
+        {
+            return false;
+        }
+        *it = sample;
+        Save();
+        return true;
     }
 
     bool Delete(const std::string& sampleId)
     {
-        return false;
+        auto it = std::find_if(samples_.begin(), samples_.end(), [&sampleId](const Sample& existing)
+            {
+                return existing.SampleId == sampleId;
+            });
+        if (it == samples_.end())
+        {
+            return false;
+        }
+        samples_.erase(it);
+        Save();
+        return true;
     }
 
 private:
