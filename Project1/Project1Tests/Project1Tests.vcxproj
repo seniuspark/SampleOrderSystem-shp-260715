@@ -102,6 +102,8 @@
     <ClCompile Include="OrderStatusTest.cpp" />
     <ClCompile Include="OrderTest.cpp" />
     <ClCompile Include="ProductionQueueCalculatorTest.cpp" />
+    <ClCompile Include="StockStatusJudgeTest.cpp" />
+    <ClCompile Include="ClockTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
