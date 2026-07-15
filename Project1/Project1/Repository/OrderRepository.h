@@ -41,6 +41,16 @@ public:
         Save();
     }
 
+    bool Update(const Order& order)
+    {
+        return false;
+    }
+
+    bool Delete(const std::string& orderId)
+    {
+        return false;
+    }
+
 private:
     static constexpr const char* OrdersKey = "orders";
 

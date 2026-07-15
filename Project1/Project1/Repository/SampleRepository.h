@@ -41,6 +41,16 @@ public:
         Save();
     }
 
+    bool Update(const Sample& sample)
+    {
+        return false;
+    }
+
+    bool Delete(const std::string& sampleId)
+    {
+        return false;
+    }
+
 private:
     static constexpr const char* SamplesKey = "samples";
 
