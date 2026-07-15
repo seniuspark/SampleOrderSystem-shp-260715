@@ -1,9 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include <fstream>
 #include <optional>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -52,23 +50,7 @@ private:
     static std::vector<Sample> Load(const std::filesystem::path& filePath)
     {
         std::vector<Sample> samples;
-
-        std::ifstream input(filePath);
-        if (!input.is_open())
-        {
-            return samples;
-        }
-
-        std::ostringstream buffer;
-        buffer << input.rdbuf();
-        std::string content = buffer.str();
-        if (content.empty())
-        {
-            return samples;
-        }
-
-        nlohmann::json root = nlohmann::json::parse(content);
-        for (const nlohmann::json& element : root.at(SamplesKey))
+        for (const nlohmann::json& element : JsonCodec::ReadJsonArray(filePath, SamplesKey))
         {
             samples.push_back(JsonCodec::SampleFromJson(element));
         }
@@ -77,16 +59,11 @@ private:
 
     void Save() const
     {
-        std::filesystem::create_directories(filePath_.parent_path());
-
-        nlohmann::json root;
-        root[SamplesKey] = nlohmann::json::array();
+        nlohmann::json array = nlohmann::json::array();
         for (const Sample& sample : samples_)
         {
-            root[SamplesKey].push_back(JsonCodec::ToJson(sample));
+            array.push_back(JsonCodec::ToJson(sample));
         }
-
-        std::ofstream output(filePath_);
-        output << root.dump(2);
+        JsonCodec::WriteJsonArray(filePath_, SamplesKey, array);
     }
 };
