@@ -17,3 +17,14 @@ TEST(SampleTest, RejectsYieldOutOfRange)
     EXPECT_THROW(Sample("S-002", "TestSample", 10.0, 0.0, 5), std::invalid_argument);
     EXPECT_THROW(Sample("S-002", "TestSample", 10.0, 1.1, 5), std::invalid_argument);
 }
+
+TEST(SampleTest, RejectsAvgProductionTimeNotPositive)
+{
+    EXPECT_THROW(Sample("S-003", "TestSample", 0.0, 0.9, 5), std::invalid_argument);
+    EXPECT_THROW(Sample("S-003", "TestSample", -1.0, 0.9, 5), std::invalid_argument);
+}
+
+TEST(SampleTest, RejectsNegativeStock)
+{
+    EXPECT_THROW(Sample("S-004", "TestSample", 10.0, 0.9, -1), std::invalid_argument);
+}
