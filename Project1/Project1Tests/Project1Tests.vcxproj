@@ -99,6 +99,8 @@
   <ItemGroup>
     <ClCompile Include="HarnessSanityTest.cpp" />
     <ClCompile Include="SampleTest.cpp" />
+    <ClCompile Include="OrderStatusTest.cpp" />
+    <ClCompile Include="OrderTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
