@@ -11,3 +11,9 @@ TEST(SampleTest, CreatesWithGivenFieldsRetained)
     EXPECT_DOUBLE_EQ(sample.Yield, 0.9);
     EXPECT_EQ(sample.Stock, 5);
 }
+
+TEST(SampleTest, RejectsYieldOutOfRange)
+{
+    EXPECT_THROW(Sample("S-002", "TestSample", 10.0, 0.0, 5), std::invalid_argument);
+    EXPECT_THROW(Sample("S-002", "TestSample", 10.0, 1.1, 5), std::invalid_argument);
+}
