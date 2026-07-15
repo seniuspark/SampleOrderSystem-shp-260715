@@ -6,9 +6,6 @@
 class Sample
 {
 public:
-    static constexpr double MinYieldExclusive = 0.0;
-    static constexpr double MaxYieldInclusive = 1.0;
-
     Sample(std::string sampleId, std::string name, double avgProductionTime, double yield, int stock)
         : SampleId(std::move(sampleId)), Name(std::move(name)), AvgProductionTime(avgProductionTime), Yield(yield), Stock(stock)
     {
@@ -22,6 +19,9 @@ public:
     int Stock;
 
 private:
+    static constexpr double MinYieldExclusive = 0.0;
+    static constexpr double MaxYieldInclusive = 1.0;
+
     void ValidateInvariants() const
     {
         if (Yield <= MinYieldExclusive || Yield > MaxYieldInclusive)
