@@ -78,6 +78,19 @@
 - `Json/`의 `PersistenceReloadTests.cpp`처럼 "새 인스턴스로 재로딩" 테스트가
   Sample/Order 각각에 존재한다.
 
+## 가용재고/OrderId 채번 관련 Repository 설계 결정 (`docs/PRD.md` 참고)
+
+- `docs/PRD.md`에서 확정한 "가용재고 = Stock − 미출고 CONFIRMED 수량 합"
+  계산과 "OrderId 일자별 채번"에 Repository의 새 API를 추가하지 않는다.
+  `OrderRepository`는 위 시그니처(`GetAll`/`FindById`/`Add`/`Update`/`Delete`)만
+  유지하고, 미출고 `CONFIRMED` 수량 합계·기존 `OrderId` 목록 집계는
+  Phase 3(Controller)가 `GetAll()` 결과를 순수 함수(`AvailableStockCalculator`/
+  `OrderIdAllocator`, Phase 1)에 전달해 계산한다.
+- 이렇게 두는 이유: 조회 조건(SampleId+상태, 날짜별 OrderId)이 Main 고유의
+  요구사항이라 `Json/`에서 검증된 범용 CRUD 시그니처에 없던 메서드이며, 이런
+  질의 로직까지 Repository에 넣으면 영속성 계층에 도메인 판단이 섞여
+  Clean Code 원칙(계층 간 책임 분리)에 어긋난다.
+
 ## 다음 phase와의 연결점
 
 Phase 3(Controller)은 이 Repository들을 생성자 주입으로 받아 메뉴 로직에서
