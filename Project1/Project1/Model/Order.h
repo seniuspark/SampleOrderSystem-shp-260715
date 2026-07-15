@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "OrderStatus.h"
+#include "Model/OrderStatus.h"
 
 class Order
 {
