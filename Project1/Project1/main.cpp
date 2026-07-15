@@ -9,6 +9,7 @@
 #include "Model/Sample.h"
 #include "Repository/OrderRepository.h"
 #include "Repository/SampleRepository.h"
+#include "Seed/DemoDataSeeder.h"
 #include "View/ConsoleAppView.h"
 #include "View/ConsoleMonitoringView.h"
 #include "View/ConsoleOrderView.h"
@@ -91,6 +92,20 @@ void RunReleaseMenu(OrderController& controller)
     controller.ReleaseOrder();
 }
 
+void SeedDemoDataIfRepositoriesAreEmpty(SampleRepository& sampleRepository, OrderRepository& orderRepository, const IClock& clock)
+{
+    static constexpr unsigned DemoDataSeed = 20260416;
+    static constexpr int DemoSampleCount = 5;
+    static constexpr int DemoOrderCount = 8;
+
+    if (!sampleRepository.GetAll().empty() || !orderRepository.GetAll().empty())
+    {
+        return;
+    }
+
+    DemoDataSeeder::SeedDemoData(sampleRepository, orderRepository, DemoSampleCount, DemoOrderCount, DemoDataSeed, clock);
+}
+
 }
 
 int main()
@@ -101,6 +116,8 @@ int main()
     SampleRepository sampleRepository(sampleDataPath);
     OrderRepository orderRepository(orderDataPath);
     SystemClock clock;
+
+    SeedDemoDataIfRepositoriesAreEmpty(sampleRepository, orderRepository, clock);
 
     ConsoleAppView appView;
     ConsoleSampleView sampleView;

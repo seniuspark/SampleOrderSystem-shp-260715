@@ -119,6 +119,8 @@
     <ClCompile Include="ConsoleOrderViewTest.cpp" />
     <ClCompile Include="ConsoleProductionLineViewTest.cpp" />
     <ClCompile Include="ConsoleMonitoringViewTest.cpp" />
+    <ClCompile Include="DemoDataSeederTest.cpp" />
+    <ClCompile Include="BoundaryTests\LayerBoundaryTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
